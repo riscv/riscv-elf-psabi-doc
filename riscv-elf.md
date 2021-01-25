@@ -304,6 +304,14 @@ are passed by reference, vector values are stored on the stack aligned to the
 size of the elements in the vector. The addresses of the vector or mask values on
 the stack are passed according to the integer calling convention.
 
+Vector tuple types for Zvlsseg will be decoupled as `NF` vector values when passing
+as arguments. `NF` is the number of fields for the tuple types. For example, values
+with the tuple type for LMUL = 2 and NF = 3 will be passed as 3 vector arugments
+with LMUL = 2. If there is no enough vector registers for the vector tuple, it
+will use up the vector argument registers and the remaining values will be passed
+by reference. v8-v15 are enough for vector tuple return values because
+`LMUL` * `NF` &le; 8 in V specification.
+
 No vector registers shall be preserved across procedure calls.
 
 There is no scalar values passed through vector registers. There is no vector
