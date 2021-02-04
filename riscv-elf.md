@@ -510,65 +510,81 @@ Global Offset Table or DWARF meta data.
 The following table provides details of the RISC-V ELF relocations (instruction
 specific relocations show the instruction type in the Details column):
 
-Enum | ELF Reloc Type        | Description                     | Field       | Calculation | Details
-:--- | :------------------   | :---------------                | :----       | :---------- | :-------
-0    | R_RISCV_NONE          | None                            |
-1    | R_RISCV_32            | Runtime relocation              | _word32_    | S + A
-2    | R_RISCV_64            | Runtime relocation              | _word64_    | S + A
-3    | R_RISCV_RELATIVE      | Runtime relocation              | _wordclass_ | B + A
-4    | R_RISCV_COPY          | Runtime relocation              |             |             | Must be in executable; not allowed in shared library
-5    | R_RISCV_JUMP_SLOT     | Runtime relocation              | _wordclass_ | S           | Handled by PLT unless `LD_BIND_NOW`
-6    | R_RISCV_TLS_DTPMOD32  | TLS relocation                  | _word32_    | S->TLSINDEX
-7    | R_RISCV_TLS_DTPMOD64  | TLS relocation                  | _word64_    | S->TLSINDEX
-8    | R_RISCV_TLS_DTPREL32  | TLS relocation                  | _word32_    | S + A + TLS - TLS_TP_OFFSET
-9    | R_RISCV_TLS_DTPREL64  | TLS relocation                  | _word64_    | S + A + TLS - TLS_TP_OFFSET
-10   | R_RISCV_TLS_TPREL32   | TLS relocation                  | _word32_    | S + A + TLS + S_TLS_OFFSET - TLS_DTV_OFFSET
-11   | R_RISCV_TLS_TPREL64   | TLS relocation                  | _word64_    | S + A + TLS + S_TLS_OFFSET - TLS_DTV_OFFSET
-16   | R_RISCV_BRANCH        | PC-relative branch              | _B-Type_    | S + A - P
-17   | R_RISCV_JAL           | PC-relative jump                | _J-Type_    | S + A - P
-18   | R_RISCV_CALL          | PC-relative call                | _J-Type_    | S + A - P   | Macros `call`, `tail`
-19   | R_RISCV_CALL_PLT      | PC-relative call (PLT)          | _J-Type_    | S + A - P   | Macros `call`, `tail` (PIC)
-20   | R_RISCV_GOT_HI20      | PC-relative GOT reference       | _U-Type_    | G + A - P   | `%got_pcrel_hi(symbol)`
-21   | R_RISCV_TLS_GOT_HI20  | PC-relative TLS IE GOT offset   | _U-Type_    |             | Macro `la.tls.ie`
-22   | R_RISCV_TLS_GD_HI20   | PC-relative TLS GD reference    | _U-Type_    |             | Macro `la.tls.gd`
-23   | R_RISCV_PCREL_HI20    | PC-relative reference           | _U-Type_    | S + A - P   | `%pcrel_hi(symbol)`
-24   | R_RISCV_PCREL_LO12_I  | PC-relative reference           | _I-type_    | S + A - P   | `%pcrel_lo(address of %pcrel_hi)`
-25   | R_RISCV_PCREL_LO12_S  | PC-relative reference           | _S-Type_    | S + A - P   | `%pcrel_lo(address of %pcrel_hi)`
-26   | R_RISCV_HI20          | Absolute address                | _U-Type_    | S + A       | `%hi(symbol)`
-27   | R_RISCV_LO12_I        | Absolute address                | _I-Type_    | S + A       | `%lo(symbol)`
-28   | R_RISCV_LO12_S        | Absolute address                | _S-Type_    | S + A       | `%lo(symbol)`
-29   | R_RISCV_TPREL_HI20    | TLS LE thread offset            | _U-Type_    |             | `%tprel_hi(symbol)`
-30   | R_RISCV_TPREL_LO12_I  | TLS LE thread offset            | _I-Type_    |             | `%tprel_lo(symbol)`
-31   | R_RISCV_TPREL_LO12_S  | TLS LE thread offset            | _S-Type_    |             | `%tprel_lo(symbol)`
-32   | R_RISCV_TPREL_ADD     | TLS LE thread usage             |             |             | `%tprel_add(symbol)`
-33   | R_RISCV_ADD8          | 8-bit label addition            | _word8_     | V + S + A
-34   | R_RISCV_ADD16         | 16-bit label addition           | _word16_    | V + S + A
-35   | R_RISCV_ADD32         | 32-bit label addition           | _word32_    | V + S + A
-36   | R_RISCV_ADD64         | 64-bit label addition           | _word64_    | V + S + A
-37   | R_RISCV_SUB8          | 8-bit label subtraction         | _word8_     | V - S - A
-38   | R_RISCV_SUB16         | 16-bit label subtraction        | _word16_    | V - S - A
-39   | R_RISCV_SUB32         | 32-bit label subtraction        | _word32_    | V - S - A
-40   | R_RISCV_SUB64         | 64-bit label subtraction        | _word64_    | V - S - A
-41   | R_RISCV_GNU_VTINHERIT | GNU C++ vtable hierarchy        |
-42   | R_RISCV_GNU_VTENTRY   | GNU C++ vtable member usage     |
-43   | R_RISCV_ALIGN         | Alignment statement             |
-44   | R_RISCV_RVC_BRANCH    | PC-relative branch offset       | _CB-Type_   | S + A - P
-45   | R_RISCV_RVC_JUMP      | PC-relative jump offset         | _CJ-Type_   | S + A - P
-46   | R_RISCV_RVC_LUI       | Absolute address                | _CI-Type_   | S + A
-47   | R_RISCV_GPREL_I       | GP-relative reference           | _I-Type_    | S + A - GP
-48   | R_RISCV_GPREL_S       | GP-relative reference           | _S-Type_    | S + A - GP
-49   | R_RISCV_TPREL_I       | TP-relative TLS LE load         | _I-Type_
-50   | R_RISCV_TPREL_S       | TP-relative TLS LE store        | _S-Type_
-51   | R_RISCV_RELAX         | Instruction can be relaxed      |             |              | Paired with a normal relocation at the same address
-52   | R_RISCV_SUB6          | Local label subtraction         | _word6_     | V - S - A
-53   | R_RISCV_SET6          | Local label assignment          | _word6_     | S + A
-54   | R_RISCV_SET8          | Local label assignment          | _word8_     | S + A
-55   | R_RISCV_SET16         | Local label assignment          | _word16_    | S + A
-56   | R_RISCV_SET32         | Local label assignment          | _word32_    | S + A
-57   | R_RISCV_32_PCREL      | PC-relative reference           | _word32_    | S + A - P
-58   | R_RISCV_IRELATIVE     | Runtime relocation              | _wordclass_ | `ifunc_resolver(B + A)`
-59-191  | *Reserved*         | Reserved for future standard use
-192-255 | *Reserved*         | Reserved for nonstandard ABI extensions
+Enum     | ELF Reloc Type               | Description                     | Field       | Calculation | Details
+:---     | :-------------               | :----------                     | :----       | :---------- | :------
+0        | R_RISCV_NONE                 | None                            |
+1        | R_RISCV_32                   | Runtime relocation              | _word32_    | S + A
+2        | R_RISCV_64                   | Runtime relocation              | _word64_    | S + A
+3        | R_RISCV_RELATIVE             | Runtime relocation              | _wordclass_ | B + A
+4        | R_RISCV_COPY                 | Runtime relocation              |             |             | Must be in executable. not allowed in shared library
+5        | R_RISCV_JUMP_SLOT            | Runtime relocation              | _wordclass_ | S           | Handled by PLT unless `LD_BIND_NOW`
+6        | R_RISCV_TLS_DTPMOD32         | TLS relocation                  | _word32_    | S->TLSINDEX
+7        | R_RISCV_TLS_DTPMOD64         | TLS relocation                  | _word64_    | S->TLSINDEX
+8        | R_RISCV_TLS_DTPREL32         | TLS relocation                  | _word32_    | S + A + TLS - TLS_TP_OFFSET
+9        | R_RISCV_TLS_DTPREL64         | TLS relocation                  | _word64_    | S + A + TLS - TLS_TP_OFFSET
+10       | R_RISCV_TLS_TPREL32          | TLS relocation                  | _word32_    | S + A + TLS + S_TLS_OFFSET - TLS_DTV_OFFSET
+11       | R_RISCV_TLS_TPREL64          | TLS relocation                  | _word64_    | S + A + TLS + S_TLS_OFFSET - TLS_DTV_OFFSET
+16       | R_RISCV_BRANCH               | PC-relative branch              | _B-Type_    | S + A - P
+17       | R_RISCV_JAL                  | PC-relative jump                | _J-Type_    | S + A - P
+18       | R_RISCV_CALL                 | PC-relative call                | _J-Type_    | S + A - P   | Macros `call`, `tail`
+19       | R_RISCV_CALL_PLT             | PC-relative call (PLT)          | _J-Type_    | S + A - P   | Macros `call`, `tail` (PIC)
+20       | R_RISCV_GOT_HI20             | PC-relative GOT reference       | _U-Type_    | G + A       | `%got_pcrel_hi(symbol)`
+21       | R_RISCV_TLS_GOT_HI20         | PC-relative TLS IE GOT offset   | _U-Type_    |             | Macro `la.tls.ie`
+22       | R_RISCV_TLS_GD_HI20          | PC-relative TLS GD reference    | _U-Type_    |             | Macro `la.tls.gd`
+23       | R_RISCV_PCREL_HI20           | PC-relative reference           | _U-Type_    | S + A - P   | `%pcrel_hi(symbol)`
+24       | R_RISCV_PCREL_LO12_I         | PC-relative reference           | _I-type_    | S + A - P   | `%pcrel_lo(address of %pcrel_hi)`
+25       | R_RISCV_PCREL_LO12_S         | PC-relative reference           | _S-Type_    | S + A - P   | `%pcrel_lo(address of %pcrel_hi)`
+26       | R_RISCV_HI20                 | Absolute address                | _U-Type_    | S + A       | `%hi(symbol)`
+27       | R_RISCV_LO12_I               | Absolute address                | _I-Type_    | S + A       | `%lo(symbol)`
+28       | R_RISCV_LO12_S               | Absolute address                | _S-Type_    | S + A       | `%lo(symbol)`
+29       | R_RISCV_TPREL_HI20           | TLS LE thread offset            | _U-Type_    |             | `%tprel_hi(symbol)`
+30       | R_RISCV_TPREL_LO12_I         | TLS LE thread offset            | _I-Type_    |             | `%tprel_lo(symbol)`
+31       | R_RISCV_TPREL_LO12_S         | TLS LE thread offset            | _S-Type_    |             | `%tprel_lo(symbol)`
+32       | R_RISCV_TPREL_ADD            | TLS LE thread usage             |             |             | `%tprel_add(symbol)`
+33       | R_RISCV_ADD8                 | 8-bit label addition            | _word8_     | V + S + A
+34       | R_RISCV_ADD16                | 16-bit label addition           | _word16_    | V + S + A
+35       | R_RISCV_ADD32                | 32-bit label addition           | _word32_    | V + S + A
+36       | R_RISCV_ADD64                | 64-bit label addition           | _word64_    | V + S + A
+37       | R_RISCV_SUB8                 | 8-bit label subtraction         | _word8_     | V - S - A
+38       | R_RISCV_SUB16                | 16-bit label subtraction        | _word16_    | V - S - A
+39       | R_RISCV_SUB32                | 32-bit label subtraction        | _word32_    | V - S - A
+40       | R_RISCV_SUB64                | 64-bit label subtraction        | _word64_    | V - S - A
+41       | R_RISCV_GNU_VTINHERIT        | GNU C++ vtable hierarchy        |
+42       | R_RISCV_GNU_VTENTRY          | GNU C++ vtable member usage     |
+43       | R_RISCV_ALIGN                | Alignment statement             |
+44       | R_RISCV_RVC_BRANCH           | PC-relative branch offset       | _CB-Type_   | S + A - P
+45       | R_RISCV_RVC_JUMP             | PC-relative jump offset         | _CJ-Type_   | S + A - P
+46       | R_RISCV_RVC_LUI              | Absolute address                | _CI-Type_   | S + A
+47       | R_RISCV_GPREL_I              | GP-relative reference           | _I-Type_    | S + A - GP
+48       | R_RISCV_GPREL_S              | GP-relative reference           | _S-Type_    | S + A - GP
+49       | R_RISCV_TPREL_I              | TP-relative TLS LE load         | _I-Type_
+50       | R_RISCV_TPREL_S              | TP-relative TLS LE store        | _S-Type_
+51       | R_RISCV_RELAX                | Instruction pair can be relaxed |
+52       | R_RISCV_SUB6                 | Local label subtraction         | _word6_     | V - S - A
+53       | R_RISCV_SET6                 | Local label assignment          | _word6_     | S + A
+54       | R_RISCV_SET8                 | Local label assignment          | _word8_     | S + A
+55       | R_RISCV_SET16                | Local label assignment          | _word16_    | S + A
+56       | R_RISCV_SET32                | Local label assignment          | _word32_    | S + A
+57       | R_RISCV_32_PCREL             | PC-relative reference           | _word32_    | S + A - P
+58       | R_RISCV_IRELATIVE            | Runtime relocation              | _wordclass_ | `ifunc_resolver(B + A)`
+59       | R_RISCV_64_PCREL             | PC-relative reference           | _word64_    | S + A - P
+60       | R_RISCV_GPREL_HI20           | GP-relative reference           | _U-type_    | S + A - GP  | `%gprel_hi(symbol)`
+61       | R_RISCV_GPREL_LO12_I         | GP-relative reference           | _I-type_    | S + A - GP  | `%gprel_lo(symbol)`
+62       | R_RISCV_GPREL_LO12_S         | GP-relative reference           | _S-type_    | S + A - GP  | `%gprel_lo(symbol)`
+63       | R_RISCV_GPREL_ADD            | GP-relative usage               |             |             | `%gprel_add(symbol)`
+64       | R_RISCV_GOT_GPREL_HI20       | GP-relative GOT reference       | _U-type_    | G + A - GP  | `%got_gprel_hi(symbol)`
+65       | R_RISCV_GOT_GPREL_LO12_I     | GP-relative GOT reference       | _I-type_    | G + A - GP  | `%got_gprel_lo(symbol)`
+66       | R_RISCV_GOT_GPREL_ADD        | GP-relative GOT usage           |             |             | `%got_gprel_add(symbol)`
+67       | R_RISCV_GOT_GPREL_LOAD       | GP-relative GOT usage           |             |             | `%got_gprel(symbol)`
+68       | R_RISCV_GOT_GPREL_STORE      | GP-relative GOT usage           |             |             | `%got_gprel(symbol)`
+69       | R_RISCV_TLS_GOT_GPREL_HI20   | GP-relative TLS GOT reference   |             |             | Macro `la.tls.ie.gprel`
+70       | R_RISCV_TLS_GOT_GPREL_LO20_I | GP-relative TLS GOT reference   |             |             | Macro `la.tls.ie.gprel`
+71       | R_RISCV_TLS_GOT_GPREL_ADD    | GP-relative TLS GOT usage       |             |             | `%tls_ie_gprel(<symbol>)`
+72       | R_RISCV_TLS_GD_GPREL_HI20    | GP-relative TLS GD reference    |             |             | Macro `la.tls.gd.gprel`
+73       | R_RISCV_TLS_GD_GPREL_LO20_I  | GP-relative TLS GD reference    |             |             | Macro `la.tls.gd.gprel`
+74       | R_RISCV_TLS_GD_GPREL_ADD     | GP-relative TLS GD usage        |             |             | `%tls_gd_gprel(<symbol>)`
+75-191   | *Reserved*                   | Reserved for future standard use
+192-255  | *Reserved*                   | Reserved for nonstandard ABI extensions
 
 Nonstandard extensions are free to use relocation numbers 192-255 for any
 purpose.  These relocations may conflict with other nonstandard extensions.
@@ -683,8 +699,10 @@ GOT offsets lazily on the first call to any function, except when
 `LD_BIND_NOW` is set in which case the GOT entries are populated by the
 dynamic linker before the executable is started. Lazy resolution of GOT
 entries is intended to speed up program loading by deferring symbol
-resolution to the first time the function is called. The first entry
-in the PLT occupies two 16 byte entries:
+resolution to the first time the function is called.
+
+For the small and medium code models, the first entry in the PLT occupies
+two 16 byte entries:
 
 ```
 1:   auipc  t2, %pcrel_hi(.got.plt)
@@ -697,16 +715,49 @@ in the PLT occupies two 16 byte entries:
      jr     t3
 ```
 
-Subsequent function entry stubs in the PLT take up 16 bytes and load a
-function pointer from the GOT. On the first call to a function, the
-entry redirects to the first PLT entry which calls `_dl_runtime_resolve`
-and fills in the GOT entry for subsequent calls to the function:
+For the compact code model, the first entry in the PLT has a stub that
+calculates the absolute address of a function pointer in the GOT.
+It occupies three 16 byte entries:
 
 ```
-1:  auipc   t3, %pcrel_hi(function@.got.plt)
-    l[w|d]  t3, %pcrel_lo(1b)(t3)
+1:  auipc t0, %hi_pcrel(2f) # address of 2f
+    addi  t0, %lo_pcrel(1b)
+    ld    t2, (t0)          # difference between .got.plt - 2f
+    add   t0, t0, t2        # address of .got.plt
+    add   t0, t0, t3        # address of the function pointer
+    ld    t3, (t0)          # load the function pointer
+    jr    t3
+    nop
+    nop
+    nop
+2:  .quad	.got.plt - ., 0
+```
+
+For the small and medium code models, subsequent function entries in the PLT
+take up 16 bytes and load a function pointer from the GOT.
+On the first call to a function, the entry redirects to the first PLT entr
+which calls `_dl_runtime_resolve` and fills in the GOT entry
+for subsequent calls to the function:
+
+```
+1:  auipc   t3, %pcrel_hi(function@.got.plt) # address of the function pointer
+    l[w|d]  t3, %pcrel_lo(1b)(t3)            # dereference the function pointer
     jalr    t1, t3
     nop
+```
+
+For the compact code model, subsequent function entries in the PLT
+take up 16 bytes and load a function pointer from the GOT.
+On the first call to a function, the entry redirects to the first PLT entr
+which calls `_dl_runtime_resolve` and fills in the GOT entry
+for subsequent calls to the function:
+
+```
+1:  lui	t3, %hi(function@.got.plt - .got.plt) # offset to the function pointer
+    addi	t3, %lo(function@.got.plt - .got.plt)
+    jal	t1, stub@.plt
+    nop
+
 ```
 
 
@@ -904,6 +955,22 @@ label:
    {ld,lw} a5, 0(a5)             # R_RISCV_PCREL_LO12_I (label)
 ```
 
+For the compact code model,
+the pseudoinstruction `la.tls.ie.gprel` is used instead:
+
+```
+   la.tls.ie.gprel a5, symbol, gp
+```
+
+Assuming that the `gp` register holds the value of `__global_pointer$`,
+it expands to the following assembly instructions and relocations:
+
+```
+   lui a5, %tls_ie_gprel_hi(symbol)         # R_RISCV_TLS_GOT_GPREL_HI20 (symbol)
+   add a5, gp, a5,  %tls_ie_gprel(symbol)   # R_RISCV_TLS_GOT_GPREL_ADD (symbol)
+   addi a5, a5, %tls_ie_gprel_lo(symbol)    # R_RISCV_TLS_GOT_GPREL_LO12_I (symbol)
+```
+
 
 ### Global Dynamic
 
@@ -941,6 +1008,22 @@ expands to the following assembly instructions and relocations:
 label:
    auipc a0,0                    # R_RISCV_TLS_GD_HI20 (symbol)
    addi  a0,a0,0                 # R_RISCV_PCREL_LO12_I (label)
+```
+
+For the compact code model,
+the pseudoinstruction `la.tls.gd.gprel` is used instead:
+
+```
+   la.tls.gd.gprel a5, symbol, t0
+```
+
+Assuming that the `t0` register holds the value of `__global_pointer$`,
+it expands to the following assembly instructions and relocations:
+
+```
+   lui a5, %tls_gd_gprel_hi(symbol)         # R_RISCV_TLS_GD_GPREL_HI20 (symbol)
+   add a5, gp, a5,  %tls_gd_gprel(symbol)   # R_RISCV_TLS_GD_GPREL_ADD (symbol)
+   addi a5, a5, %tls_gd_gprel_lo(symbol)    # R_RISCV_TLS_GD_GPREL_LO12_I (symbol)
 ```
 
 In the Global Dynamic model, the runtime library provides the `__tls_get_addr` function:
