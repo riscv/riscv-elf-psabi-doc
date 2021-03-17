@@ -4,12 +4,12 @@
 1. [Register Convention](#register-convention)
 	* [Integer Register Convention](#integer-register-convention)
 	* [Floating-point Register Convention](#floating-point-register-convention)
-	* [Vector Register Convention](#vector-register-convention)
+	* [(Draft) Vector Register Convention](#vector-register-convention)
 2. [Procedure Calling Convention](#procedure-calling-convention)
 	* [Integer Calling Convention](#integer-calling-convention)
 	* [Hardware Floating-point Calling Convention](#hardware-floating-point-calling-convention)
 	* [ILP32E Calling Convention](#ilp32e-calling-convention)
-	* [Vector Calling Convention](#vector-calling-convention)
+	* [(Draft) Vector Calling Convention](#vector-calling-convention)
 	* [Named ABIs](#named-abis)
 	* [Default ABIs](#default-abis)
 	* [Code models](#code-models)
@@ -93,7 +93,7 @@ The Floating-Point Control and Status Register (fcsr) must have thread storage
 duration in accordance with C11 section 7.6 "Floating-point environment
 <fenv.h>".
 
-Vector Register Convention <a name=vector-register-convention>
+(Draft) Vector Register Convention <a name=vector-register-convention>
 -------------------------------------------------------------------------
 Name    | ABI Mnemonic | Meaning                      | Preserved across calls?
 --------|--------------|------------------------------|------------------------
@@ -101,6 +101,8 @@ v0      |              | Argument register for mask*  | No
 v1-v7   |              | Temporary registers          | No
 v8-v23  |              | Argument registers           | No
 v24-v31 |              | Temporary registers          | No
+vl      |              | Vector length                | No
+vtype   |              | Vector data type register    | No
 
 *: v0 is used as the mask register for masked vector instructions. It is also used as the first mask argument in the procedure calling convention. If there is no need to use it as the mask, it can be considered a temporary register.
 
@@ -280,7 +282,7 @@ The ILP32E calling convention is not compatible with ISAs that have registers
 that require load and store alignments of more than 32 bits. In particular, this
 calling convention must not be used with the D ISA extension.
 
-## <a name=vector-calling-convention></a> Vector Calling Convention
+## <a name=vector-calling-convention></a> (Draft) Vector Calling Convention
 
 The vector calling convention provides sixteen argument registers, v8-v23, for
 passing vector values and one mask register, v0, for passing mask values.
@@ -294,15 +296,16 @@ argument register. Vectors that are LMUL = 2 are passed in 2-aligned vector
 argument registers. Vectors that are LMUL = 4 are passed in 4-aligned vector
 argument registers. Vectors that are LMUL = 8 are passed in 8-aligned vector
 argument registers. If there is no available vector registers, vectors are
-passed by reference. If there are mask arguments, the first mask argument
-is passed in v0. The remaining mask arguments follow the rule for general vector
-arguments. The mask argument occupies a single vector register regardless how
-many bits are effective in the mask. If there is no available vector registers
-for the mask arguments, mask arguments are passed by reference. The value of
-mask arguments occupy VLEN bits on the stack aligned to one byte. If vector values
-are passed by reference, vector values are stored on the stack aligned to the
-size of the elements in the vector. The addresses of the vector or mask values on
-the stack are passed according to the integer calling convention.
+passed by reference. If there are mask type arguments, the first mask type
+argument is passed in v0. The remaining mask type arguments follow the rule for
+general vector arguments. The mask type argument occupies a single vector
+register regardless how many bits are effective in the mask. If there is no
+available vector registers for the mask type arguments, mask type arguments are
+passed by reference. The value of mask type arguments occupy VLEN bits on the
+stack aligned to one byte. If vector values are passed by reference, vector
+values are stored on the stack aligned to the size of the elements in the vector.
+The addresses of the vector or mask values on the stack are passed according
+to the integer calling convention.
 
 Vector tuple types for Zvlsseg will be flattened as `NF` vector values when passing
 as arguments. `NF` is the number of fields for the tuple types. For example, values
@@ -312,7 +315,7 @@ will use up the vector argument registers and the remaining values will be passe
 by reference. v8-v15 are enough for vector tuple return values because
 `LMUL` * `NF` &le; 8 in V specification.
 
-No vector registers shall be preserved across procedure calls.
+v0-v31, vl, and vtype shall not be preserved across procedure calls.
 
 There is no scalar values passed through vector registers. There is no vector
 values passed through scalar registers. There is no need to define a new ABI
