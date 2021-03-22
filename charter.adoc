@@ -1,0 +1,55 @@
+= Charter  =
+RISC-V International psABI TG
+:toc:
+:icons: font
+:numbered:
+:source-highlighter: rouge
+
+////
+SPDX-License-Identifier: CC-BY-4.0
+
+Document conventions:
+- one line per paragraph (don't fill lines - this makes changes clearer)
+- Wikipedia heading conventions (First word only capitalized)
+- US spelling throughout.
+////
+
+== Overview
+
+This document has been approved by the SIG membership at its meeting on XXX.  It awaits ratification by the Technical Steering Committee.
+
+== Scope
+
+The scope of the TG is maintenance the specification for psABI,
+which included but not limited to following items:
+
+1. ELF, DWARF, and other relevant formats.
+2. Code model.
+3. Calling conventions.
+
+== Goals
+
+The TG's main goal are:
+
+1. Improve and clarify psABI specification.
+
+2. Review and approval for psABI relevant proposals
+
+3. Coordinate with other ABI groups to ensure their specs are consistent with
+the psABI specification.
+
+4. Make space for custom extensions to avoid conflicts.
+
+
+== Document history
+[cols="<1,<2,<3,<4",options="header,pagewidth",]
+ht|================================================================================
+| _Revision_ | _Date_            | _Author_ | _Modification_
+| 0.01      | 2x March 2021  |
+
+Kito Cheng,
+Jessica Clarke |
+
+Initial version for discussion.
+
+|================================================================================
