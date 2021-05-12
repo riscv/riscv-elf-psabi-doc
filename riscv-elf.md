@@ -374,15 +374,13 @@ Does not apply to the ILP32 ABIs.
 
 ## <a name=dynamic-linking /> Dynamic linking
 
-Lazily bound functions must follow the standard calling conventions. The
-resolver in the dynamic linker will save/restore `a0-a7` for integer calling
-convention and save/restore `fa0-fa7` for hardware floating-point calling
-convention to avoid ruining the arguments before jumping to the resolved
-function. If there is any need to support non-standard calling convention for
-lazily bound functions, the symbol needs to be decorated using
-`STO_RISCV_BIND_NOW`. With the attribute in the symbol, the function call
-will not go through the resolver in the dynamic linker. The function address
-will be resolved during program loading.
+Lazy binding must follow the standard calling conventions. The resolver in the
+dynamic linker will save/restore `a0-a7` for integer calling convention and
+save/restore `fa0-fa7` for hardware floating-point calling convention to avoid
+ruining the arguments before jumping to the resolved function. If there is any
+need to support non-standard calling convention for lazy binding, the symbol
+needs to be decorated using `STO_RISCV_BIND_NOW`. With the attribute in the
+symbol, the function address will be resolved during program loading.
 
 # <a name=c-types></a> C type details
 
@@ -522,13 +520,13 @@ There are no RISC-V specific definitions relating to ELF string tables.
 
 * st_other: The lower 2 bits are used to specify a symbol's visibility. The
   remaining 6 bits have no defined meaning in gABI. We use the highest bit for
-  the bind now semantic of the function call with the non-standard calling
+  the eager binding semantic of the function call with the non-standard calling
   convention or any other special purpose to avoid going through the resolver.
   For example, vector registers have variant size. It may be from 128 bits to
-  4096 bits or larger. It depends on the hardware implementations. To
+  4096 bits or larger. It depends on the hardware implementation. To
   save/restore all these vector arguments in the resolver will occupy a large
-  portion of stack space. In addition, the efficiency is also a factor to
-  consider for vector calls.
+  portion of stack space. Additionally, it may adversely impact the performance
+  of such functions.
 
   RISC-V specific `st_other` flags
   --------------------------
@@ -536,12 +534,12 @@ There are no RISC-V specific definitions relating to ELF string tables.
   -------------------|------
   STO_RISCV_BIND_NOW | 0x80
 
-  If `STO_RISCV_BIND_NOW` is set, the dynamic linker will resolve the symbol
-  during program loading. The resolved symbol address will be filled into GOT
-  entry regardless `LD_BIND_NOW` is set or not under dynamic linking for PIC
-  code.
+  If `STO_RISCV_BIND_NOW` is set, the dynamic linker will always resolve the
+  symbol during program loading. The resolved symbol address will be filled
+  into GOT entry regardless if `LD_BIND_NOW` is set or not under dynamic
+  linking.
 
-  Static linkers must set the flag for the symbol following the bind now
+  Static linkers must set the flag for the symbol following the eager binding
   semantic in the dynamic symbol table and add a `DT_RISCV_BIND_NOW` dynamic
   tag in the Dynamic Section of the object.
 
