@@ -379,7 +379,7 @@ dynamic linker will save/restore `a0-a7` for integer calling convention and
 save/restore `fa0-fa7` for hardware floating-point calling convention to avoid
 ruining the arguments before jumping to the resolved function. If there is any
 need to support non-standard calling convention for lazy binding, the symbol
-needs to be decorated using `STO_RISCV_BIND_NOW`. With the attribute in the
+needs to be annotated using `STO_RISCV_VARIANT_CC`. With this attribute in the
 symbol, the function address will be resolved during program loading.
 
 # <a name=c-types></a> C type details
@@ -529,18 +529,18 @@ There are no RISC-V specific definitions relating to ELF string tables.
   of such functions.
 
   RISC-V specific `st_other` flags
-  --------------------------
-  Name               | Mask
-  -------------------|------
-  STO_RISCV_BIND_NOW | 0x80
+  ----------------------------
+  Name                 | Mask
+  ---------------------|------
+  STO_RISCV_VARIANT_CC | 0x80
 
-  If `STO_RISCV_BIND_NOW` is set, the dynamic linker will always resolve the
+  If `STO_RISCV_VARIANT_CC` is set, the dynamic linker will always resolve the
   symbol during program loading. The resolved symbol address will be filled
   into GOT entry regardless if `LD_BIND_NOW` is set or not under dynamic
   linking.
 
   Static linkers must set the flag for the symbol following the eager binding
-  semantic in the dynamic symbol table and add a `DT_RISCV_BIND_NOW` dynamic
+  semantic in the dynamic symbol table and add a `DT_RISCV_VARIANT_CC` dynamic
   tag in the Dynamic Section of the object.
 
 ## <a name=relocations></a>Relocations
@@ -1025,12 +1025,12 @@ There are no RISC-V specific definitions relating to ELF note sections.
 ## <a name=dynamic-section></a>Dynamic Section
 
 RISC-V specific dynamic array tags
--------------------------------------------------------------------------------
-Name              | Value      | d_un  | Executable        | Shared Object
-------------------|------------|-------|-------------------|-------------------
-DT_RISCV_BIND_NOW | 0x70000001 | d_val | Platform specific | Platform specific
+---------------------------------------------------------------------------------
+Name                | Value      | d_un  | Executable        | Shared Object
+--------------------|------------|-------|-------------------|-------------------
+DT_RISCV_VARIANT_CC | 0x70000001 | d_val | Platform specific | Platform specific
 
-The object with the dynamic tag has one or more symbols with `STO_RISCV_BIND_NOW`
+The object with the dynamic tag has one or more symbols with `STO_RISCV_VARIANT_CC`
 in the dynamic symbol table.
 
 ## <a name=hash-table></a>Hash Table
