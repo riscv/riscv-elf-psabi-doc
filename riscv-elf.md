@@ -374,10 +374,7 @@ Does not apply to the ILP32 ABIs.
 
 ## <a name=dynamic-linking /> Dynamic linking
 
-Lazy binding must follow the standard calling conventions. The resolver in the
-dynamic linker will save/restore `a0-a7` for integer calling convention and
-save/restore `fa0-fa7` for hardware floating-point calling convention to avoid
-ruining the arguments before jumping to the resolved function. If there is any
+Lazy binding must follow the standard calling conventions. If there is any
 need to support non-standard calling convention for lazy binding, the symbol
 needs to be annotated using `STO_RISCV_VARIANT_CC`. With this attribute in the
 symbol, the function address will be resolved during program loading.
@@ -522,11 +519,6 @@ There are no RISC-V specific definitions relating to ELF string tables.
   remaining 6 bits have no defined meaning in gABI. We use the highest bit for
   the eager binding semantic of the function call with the non-standard calling
   convention or any other special purpose to avoid going through the resolver.
-  For example, vector registers have variant size. It may be from 128 bits to
-  4096 bits or larger. It depends on the hardware implementation. To
-  save/restore all these vector arguments in the resolver will occupy a large
-  portion of stack space. Additionally, it may adversely impact the performance
-  of such functions.
 
   RISC-V specific `st_other` flags
   ----------------------------
@@ -542,6 +534,12 @@ There are no RISC-V specific definitions relating to ELF string tables.
   Static linkers must set the flag for the symbol following the eager binding
   semantic in the dynamic symbol table and add a `DT_RISCV_VARIANT_CC` dynamic
   tag in the Dynamic Section of the object.
+
+> NOTE:
+  Vector registers have variant size. It depends on the hardware implementation.
+  To save/restore all these vector arguments in the resolver may occupy a large
+  portion of stack space. Additionally, it may adversely impact the performance
+  of such functions.
 
 ## <a name=relocations></a>Relocations
 
