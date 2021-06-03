@@ -531,13 +531,14 @@ There are no RISC-V specific definitions relating to ELF string tables.
   into GOT entry regardless if `LD_BIND_NOW` is set or not under dynamic
   linking.
 
-  Static linkers must set the flag for the symbol following the eager binding
+> NOTE:
+  Static linkers may set the flag for the symbol following the eager binding
   semantic in the dynamic symbol table and add a `DT_RISCV_VARIANT_CC` dynamic
   tag in the Dynamic Section of the object.
 
 > NOTE:
-  Vector registers have variant size. It depends on the hardware implementation.
-  To save/restore all these vector arguments in the resolver may occupy a large
+  Vector registers have a variable size depending on the hardware implementation.
+  Saving/restoring all these vector arguments, the resolver may occupy a large
   portion of stack space. Additionally, it may adversely impact the performance
   of such functions.
 
