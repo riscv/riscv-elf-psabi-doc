@@ -998,6 +998,8 @@ There are no RISC-V specific definitions relating to ELF hash tables.
 
 # <a name=dwarf></a>DWARF
 
+DWARF unwind info must be present in all RISC-V ELF images.
+
 Dwarf Register Numbers <a name=dwarf-register-numbers>
 -------------------------------------------------------------------------
 Dwarf Number  | Register Name | Description
