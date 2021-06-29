@@ -307,6 +307,13 @@ values are stored on the stack aligned to the size of the elements in the vector
 The addresses of the vector or mask values on the stack are passed according
 to the integer calling convention.
 
+The vector in V-extension is scalable vector. What the scalable vector means is
+the vector length is unknown for the compiler. Structs could not contain
+scalable vectors. The maximum possible value for V-extension is LMUL = 8 vector.
+If users use the scalable vector as the container for fixed-length vector, the
+maximum possible container type is LMUL = 8 vector. To define the behavior for
+LMUL = 1, 2, 4, 8 is enough for the V-extension.
+
 v0-v31, vl, and vtype shall not be preserved across procedure calls.
 
 There is no scalar values passed through vector registers. There is no vector
