@@ -7,10 +7,12 @@
 1. [Register Convention](#register-convention)
 	* [Integer Register Convention](#integer-register-convention)
 	* [Floating-point Register Convention](#floating-point-register-convention)
+	* [(Draft) Vector Register Convention](#vector-register-convention)
 2. [Procedure Calling Convention](#procedure-calling-convention)
 	* [Integer Calling Convention](#integer-calling-convention)
 	* [Hardware Floating-point Calling Convention](#hardware-floating-point-calling-convention)
 	* [ILP32E Calling Convention](#ilp32e-calling-convention)
+	* [(Draft) Vector Calling Convention](#vector-calling-convention)
 	* [Named ABIs](#named-abis)
 	* [Default ABIs](#default-abis)
 	* [Code models](#code-models)
@@ -100,6 +102,19 @@ f28-f31 | ft8-ft11     | Temporary registers    | No
 The Floating-Point Control and Status Register (fcsr) must have thread storage
 duration in accordance with C11 section 7.6 "Floating-point environment
 <fenv.h>".
+
+(Draft) Vector Register Convention <a name=vector-register-convention>
+-------------------------------------------------------------------------
+Name    | ABI Mnemonic | Meaning                      | Preserved across calls?
+--------|--------------|------------------------------|------------------------
+v0      |              | Argument register for mask*  | No
+v1-v7   |              | Temporary registers          | No
+v8-v23  |              | Argument registers           | No
+v24-v31 |              | Temporary registers          | No
+vl      |              | Vector length                | No
+vtype   |              | Vector data type register    | No
+
+*: v0 is used as the mask register for masked vector instructions. It is also used as the first mask argument in the procedure calling convention. If there is no need to use it as the mask, it can be considered a temporary register.
 
 # <a name=procedure-calling-convention></a> Procedure Calling Convention
 
@@ -278,6 +293,44 @@ these registers are considered temporaries.
 The ILP32E calling convention is not compatible with ISAs that have registers
 that require load and store alignments of more than 32 bits. In particular, this
 calling convention must not be used with the D ISA extension.
+
+## <a name=vector-calling-convention></a> (Draft) Vector Calling Convention
+
+The vector calling convention provides sixteen argument registers, v8-v23, for
+passing vector values and one mask register, v0, for passing mask values.
+v8-v15 are also used to return values. How many vector registers will be used as
+the return value is depended on LMUL value of the return type. v0 is a special
+register for the mask in masked vector instructions. That is why passing the first
+mask value into v0. It avoids one vector register copy from v8-v23 to v0.
+
+Vectors that are LMUL = 1 or fractional LMUL are passed in a single vector
+argument register. Vectors that are LMUL = 2 are passed in 2-aligned vector
+argument registers. Vectors that are LMUL = 4 are passed in 4-aligned vector
+argument registers. Vectors that are LMUL = 8 are passed in 8-aligned vector
+argument registers. If there is no available vector registers, vectors are
+passed by reference. If there are mask type arguments, the first mask type
+argument is passed in v0. The remaining mask type arguments follow the rule for
+general vector arguments. The mask type argument occupies a single vector
+register regardless how many bits are effective in the mask. If there is no
+available vector registers for the mask type arguments, mask type arguments are
+passed by reference. The value of mask type arguments occupy VLEN bits on the
+stack aligned to one byte. If vector values are passed by reference, vector
+values are stored on the stack aligned to the size of the elements in the vector.
+The addresses of the vector or mask values on the stack are passed according
+to the integer calling convention.
+
+The vector in V-extension is scalable vector. What the scalable vector means is
+the vector length is unknown for the compiler. Structs could not contain
+scalable vectors. The maximum possible value for V-extension is LMUL = 8 vector.
+If users use the scalable vector as the container for fixed-length vector, the
+maximum possible container type is LMUL = 8 vector. To define the behavior for
+LMUL = 1, 2, 4, 8 is enough for the V-extension.
+
+v0-v31, vl, and vtype shall not be preserved across procedure calls.
+
+There is no scalar values passed through vector registers. There is no vector
+values passed through scalar registers. There is no need to define a new ABI
+for vector. Vector calling convention is appliable for existing ABIs.
 
 ## <a name=named-abis></a> Named ABIs
 
