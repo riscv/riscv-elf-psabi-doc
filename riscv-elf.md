@@ -279,6 +279,13 @@ The ILP32E calling convention is not compatible with ISAs that have registers
 that require load and store alignments of more than 32 bits. In particular, this
 calling convention must not be used with the D ISA extension.
 
+## <a name=ilp32e-calling-convention></a> ILP32X/LP64X Calling Convention
+
+The ILP32X/LP64X calling convention is designed to be usable with the zfinx
+extension. This calling convention is the same as the integer calling
+convention, but this calling convention must be used with Zfinx extension, that
+also implied this calling convention can't used with F extension.
+
 ## <a name=named-abis></a> Named ABIs
 
 This specification defines the following named ABIs:
@@ -298,6 +305,9 @@ This specification defines the following named ABIs:
   calling convention is not used (i.e. ELFCLASS32, EF_RISCV_FLOAT_ABI_SOFT, and
   EF_RISCV_RVE).
 
+* <a name=abi-ilp32x></a> **ILP32X**: ILP32 with FinX calling convention (i.e.
+  ELFCLASS32 and EF_RISCV_FLOAT_ABI_FINX).
+
 * <a name=abi-lp64></a> **LP64**: Integer calling-convention only, hardware
   floating-point calling convention is not used (i.e. ELFCLASS64 and
   EF_RISCV_FLOAT_ABI_SOFT).
@@ -310,6 +320,9 @@ This specification defines the following named ABIs:
 
 * <a name=abi-lp64q></a> **LP64Q**: LP64 with hardware floating-point calling
   convention for FLEN=128 (i.e. ELFCLASS64 and EF_RISCV_FLOAT_ABI_QUAD).
+
+* <a name=abi-lp64x></a> **LP64X**: LP64 with FinX calling convention (i.e.
+  ELFCLASS64 and EF_RISCV_FLOAT_ABI_FINX).
 
 The ILP32\* ABIs are only compatible with RV32\* ISAs, and the LP64\* ABIs are
 only compatible with RV64\* ISAs. A future version of this specification may
@@ -466,9 +479,9 @@ rules about 2&times;XLEN aligned arguments being passed in "aligned" register pa
 * e_flags: Describes the format of this ELF file.  These flags are used by the
   linker to disallow linking ELF files with incompatible ABIs together.
 
-   Bit 0 | Bit  1 - 2 | Bit 3 | Bit 4 | Bit 5 - 31
-  -------|------------|-------|-------|------------
-   RVC   | Float ABI  |  RVE  |  TSO  | *Reserved*
+   Bit 0 | Bit  1 - 2 | Bit 3 | Bit 4 | Bit 5      | Bit 6 - 31
+  -------|------------|-------|-------|------------|-----------
+   RVC   | Float ABI  |  RVE  |  TSO  | Float ABI  | *Reserved*
 
   * EF_RISCV_RVC (0x0001): This bit is set when the binary targets the C ABI,
     which allows instructions to be aligned to 16-bit boundaries (the base RV32
@@ -487,14 +500,16 @@ rules about 2&times;XLEN aligned arguments being passed in "aligned" register pa
     store "float" and "double" values in F registers, but would not store "long
     double" values in F registers.  If none of the float ABI flags are set, the
     object is taken to use the soft-float ABI.
-  * EF_RISCV_FLOAT_ABI (0x0006): This macro is used as a mask to test for one
+  * EF_RISCV_FLOAT_ABI_FINX (0x0020): This bit is set when the binary targets
+    the FinX ABI which will use general purpose register for floating-point
+    instructions.
+  * EF_RISCV_FLOAT_ABI (0x0026): This macro is used as a mask to test for one
     of the above floating-point ABIs, e.g.,
     `(e_flags & EF_RISCV_FLOAT_ABI) == EF_RISCV_FLOAT_ABI_DOUBLE`.
   * EF_RISCV_RVE (0x0008): This bit is set when the binary targets the E ABI.
   * EF_RISCV_TSO (0x0010): This bit is set when the binary requires the RVTSO
     memory consistency model.
-
-  Until such a time that the *Reserved* bits (0xffffffe0) are allocated by
+  Until such a time that the *Reserved* bits (0xffffff80) are allocated by
   future versions of this specification, they shall not be set by standard
   software.
 
