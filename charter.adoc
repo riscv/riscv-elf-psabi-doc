@@ -43,7 +43,7 @@ the psABI specification.
 
 == Document history
 [cols="<1,<2,<3,<4",options="header,pagewidth",]
-ht|================================================================================
+|================================================================================
 | _Revision_ | _Date_            | _Author_ | _Modification_
 | 0.01      | 2x March 2021  |
 
