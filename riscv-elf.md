@@ -450,11 +450,11 @@ rules about 2&times;XLEN aligned arguments being passed in "aligned" register pa
 
 ## <a name=c++-name-mangling></a>C++ Name Mangling
 
-C++ name mangling for RISC-V is following the [Itanium C++ ABI](http://itanium-cxx-abi.github.io/cxx-abi/), there are no RISC-V
+C++ name mangling for RISC-V follows the [Itanium C++ ABI](http://itanium-cxx-abi.github.io/cxx-abi/); there are no RISC-V
 specific mangling rules.
 
 See [Type encodings](http://itanium-cxx-abi.github.io/cxx-abi/abi.html#mangling-type)
-for more detail of how to mangle a type.
+for more detail on how to mangle types.
 
 # <a name=elf-object-file></a> ELF Object Files
 
