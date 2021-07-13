@@ -30,6 +30,7 @@
 	* [Dynamic Table](#dynamic-table)
 	* [Hash Table](#hash-table)
 	* [Attributes](#Attributes)
+	* [Mapping Symbol](#mapping-symbol)
 5. [DWARF](#dwarf)
 	* [Dwarf Register Numbers](#dwarf-register-numbers)
 6. [Linux-specific ABI](#linux-abi)
@@ -1086,6 +1087,37 @@ file. Its values are defined as follows:
 Tag_RISCV_priv_spec contains the major/minor/revision version information of
 the privileged specification. It will report errors if object files of different
 privileged specification versions are merged.
+
+## <a name=mapping-symbol></a>Mapping Symbol
+
+Mapping symbol is a special symbol class used for assist disassembler to
+having better knowledge of binary, it could be used for distinguish the
+code and data region.
+
+Symbol Name | Meaning
+:---------- | :-----------------------------------------------------------
+$d          | Start of a sequence of data.
+$d<N>       | Start of a sequence of N-byte data.
+$x          | Start of a sequence of instructions.
+$x<ISA>     | Start of a sequence of instructions with <ISA> extension.
+
+Mapping symbol for data(`$d`) means following region are data,
+and it has an optional length information, for more precisely present
+the original data layout.
+
+Mapping symbol for instruction(`$x`) means following region are instructions,
+and it has an optional ISA string, which means following code region are using
+ISA different than the ISA recorded in arch attribute, the ISA information will
+used until next instruction mapping symobl; an instruction mapping symobl
+without without ISA string means using ISA configuration from ELF attribute.
+
+The use case for mapping symbol for instruction(`$x`) with ISA information is
+used with ifunc, e.g. library are built with `rv64gc`, but few functions
+like memcpy provide two version, one built with `rv64gc`, and one built with
+`rv64gcv`, and select by ifunc mechanism at run-time; however the arch
+attribute is recording for minimal execution environment requirement, so the ISA
+information from arch attribute isn't enough for disassembler to disassemble the
+`rv64gcv` version correctly.
 
 # <a name=dwarf></a>DWARF
 
