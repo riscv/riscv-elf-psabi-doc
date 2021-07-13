@@ -1044,6 +1044,7 @@ Tag_RISCV_unaligned_access          |        6 | uleb128        | Indicates whet
 Tag_RISCV_priv_spec                 |        8 | uleb128        | Indicates the major version of the privileged specification.
 Tag_RISCV_priv_spec_minor           |       10 | uleb128        | Indicates the minor version of the privileged specification.
 Tag_RISCV_priv_spec_revision        |       12 | uleb128        | Indicates the revision version of the privileged specification.
+Tag_RISCV_reserved_register         |       14 | uleb128        | Indicates the extra reserved register information.
 Reserved for non-standard attribute | >= 32768 | -              | -
 
 ### Detailed attribute description
@@ -1086,6 +1087,43 @@ file. Its values are defined as follows:
 Tag_RISCV_priv_spec contains the major/minor/revision version information of
 the privileged specification. It will report errors if object files of different
 privileged specification versions are merged.
+
+#### Tag_RISCV_reserved_register, 14, uleb128=register bit-vector
+
+Tag_RISCV_reserved_register contains the information about the reserved
+registers which are not reserved by ABI, it might reserved by specific
+compiler option like `-ffixed-x4` or special purpose ABI variant like
+overlay ABI.
+
+Format of Tag_RISCV_reserved_register is a bit-vector, each bit corresponding to
+a register, the bit order is same as dwarf register number.
+
+First bit is must set, used to distinguish between attribute is unset or having
+empty reserved register set.
+
+Tag_RISCV_reserved_register also support register list style representation for
+easier write and understand, the syntax rule is:
+
+```
+RESERVED_REGS := '{' REG_LIST '}'
+
+REG_LIST      := REG_LIST ',' REG_LIST
+               | REG_RANGE
+               | REG
+
+REG_RANGE     := REG '-' REG
+
+REG           := <register-name> | <abi-register-name> # e.g. x10, t3, f10 or fa2
+```
+
+For example, x6, x7, x8 and f10 are reserved, then the value of
+Tag_RISCV_reserved_register is 0x400000001c1, and it also could be represent as
+`{x6, x7, x8, f10}` or `{x6-x8, f10}`.
+
+It will report errors if link object files with different
+Tag_RISCV_reserved_register values, but allowed link with object with and
+without Tag_RISCV_reserved_register value, the final value will take from the
+object which has set Tag_RISCV_reserved_register.
 
 # <a name=dwarf></a>DWARF
 
